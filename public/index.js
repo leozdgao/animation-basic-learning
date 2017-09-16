@@ -6,6 +6,14 @@ function degreeToRadian(degree) {
   return degree * Math.PI / 180
 }
 
+// 勾股定理
+function pythagorean(p1, p2) {
+  const dx = p2.x - p1.x
+  const dy = p2.y - p1.y
+
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
 console.log('1 弧度等于多少角度', radianToDegree(1))
 console.log('360 度等于多少弧度', degreeToRadian(360))
 console.log('30 度正弦', Math.sin(degreeToRadian(30)))
@@ -97,6 +105,10 @@ const mouse = captureMouse(canvas)
 const ball = new Ball()
 let angle = 0, angleX = 0, angleY = 0
 const xSpeed = 1
+const speed = 0.05
+const radius = 100
+const radiusX = 100
+const radiusY = 150
 
 ;(function drawFrame() {
   requestAnimationFrame(drawFrame, canvas)
@@ -124,9 +136,14 @@ const xSpeed = 1
   // ball.draw(context)
 
   // 两个角产生波
-  ball.x = canvas.width / 2 + Math.sin(angleX) * 50
-  ball.y = canvas.height / 2 + Math.sin(angleY) * 50
-  angleX += 0.07
-  angleY += 0.11
+  // ball.x = canvas.width / 2 + Math.sin(angleX) * 50
+  // ball.y = canvas.height / 2 + Math.sin(angleY) * 50
+  // angleX += 0.07
+  // angleY += 0.11
+  // ball.draw(context)
+
+  ball.x = canvas.width / 2 + Math.sin(angle) * radiusX
+  ball.y = canvas.height / 2 + Math.cos(angle) * radiusY
+  angle += speed
   ball.draw(context)
 })()

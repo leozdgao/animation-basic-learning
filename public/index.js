@@ -14,6 +14,39 @@ function pythagorean(p1, p2) {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
+function toHexColor(r, g, b) {
+  return '#' + (r << 16 | g << 8 | b).toString('16')
+}
+
+function extractPrimaryColor(color) {
+  if (color[0] === '#') {
+    color = color.slice(1)
+  }
+
+  color = parseInt(color, 16)
+
+  return {
+    red: color >> 16 & 0xFF,
+    green: color >> 8 & 0xFF,
+    blue: color & 0xFF
+  }
+}
+
+function colorToRGB(color, alpha) {
+  const p = extractPrimaryColor(color)
+
+  if (alpha != null) {
+    alpha = alpha <= 1 ? alpha : 1
+
+    return `rgba(${p.red}, ${p.green}, ${p.blue}, ${alpha})`
+  } else {
+    return `rgb(${p.red}, ${p.green}, ${p.blue})`
+  }
+}
+
+console.log('toHexColor', toHexColor(255, 200, 255))
+console.log('colorToRGB', colorToRGB('#18F92E', 0.9))
+
 console.log('1 弧度等于多少角度', radianToDegree(1))
 console.log('360 度等于多少弧度', degreeToRadian(360))
 console.log('30 度正弦', Math.sin(degreeToRadian(30)))
@@ -78,6 +111,11 @@ class Ball {
     }
     context.restore()
   }
+
+  setPosition(x, y) {
+    ball.x = x
+    ball.y = y
+  }
 }
 
 const canvas = document.getElementById('playground')
@@ -103,12 +141,31 @@ const captureMouse = function(canvas) {
 const mouse = captureMouse(canvas)
 
 const ball = new Ball()
+ball.setPosition(canvas.width / 2, canvas.height - ball.radius)
+
+// y 轴加速度
+// let ay = 0
+// let vy = 0
+// 重力加速度
+// const gravity = 1
+
+// addEventListener('keydown', e => {
+//   if (e.keyCode === 38) {
+//     // 向上升，匀加速
+//     ay = -1.2
+//   }
+// })
+// addEventListener('keyup', e => {
+//   ay = 0
+// })
+
 let angle = 0, angleX = 0, angleY = 0
 const xSpeed = 1
 const speed = 0.05
 const radius = 100
 const radiusX = 100
 const radiusY = 150
+let vx = 0, vy = 0
 
 ;(function drawFrame() {
   requestAnimationFrame(drawFrame, canvas)
@@ -116,11 +173,19 @@ const radiusY = 150
   context.clearRect(0, 0, canvas.width, canvas.height)
 
   // 旋转动画
-  // const dx = mouse.x - arrow.x
-  // const dy = mouse.y - arrow.y
+  const dx = Math.floor(mouse.x - arrow.x)
+  const dy = Math.floor(mouse.y - arrow.y)
+  const radian = Math.atan2(dy, dx)
+  
+  const ax = Math.cos(radian) * speed
+  const ay = Math.sin(radian) * speed
+  vx += ax
+  vy += ay
 
-  // arrow.rotation = Math.atan2(dy, dx)
-  // arrow.draw(context)
+  arrow.rotation = radian
+  arrow.x += vx
+  arrow.y += vy
+  arrow.draw(context)
 
   // 线性动画 + 正弦
   // ball.x = (ball.x + xSpeed) % canvas.width
@@ -142,8 +207,24 @@ const radiusY = 150
   // angleY += 0.11
   // ball.draw(context)
 
-  ball.x = canvas.width / 2 + Math.sin(angle) * radiusX
-  ball.y = canvas.height / 2 + Math.cos(angle) * radiusY
-  angle += speed
-  ball.draw(context)
+  // 加速度公式：vt = v0 + at
+  // vy += ay
+  // console.log(vy)
+
+  // if (ball.y < canvas.height - ball.radius) {
+  //   vy += gravity
+  // }
+// console.log(vy)
+  // ball.y += vy
+
+  // if (ball.y > canvas.height - ball.radius) {
+  //   ball.y = canvas.height - ball.radius
+  //   vy = 0
+  // }
+  // if (ball.y < ball.radius) {
+  //   ball.y = ball.radius
+  // }
+
+  // angle += speed
+  // ball.draw(context)
 })()

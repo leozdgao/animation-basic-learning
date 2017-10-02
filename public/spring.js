@@ -34,51 +34,33 @@ class Ball {
 }
 
 const ball = new Ball()
-const bouncing = 1
-const friction = 0.97
-let vx = Math.random() * 10 - 5
-let vy = Math.random() * 10 - 5
-
-ball.x = canvas.width / 2
-ball.y = canvas.height / 2
+const spring = 0.1
+const targetX = canvas.width / 2
+const targetY = canvas.height / 2
+let vx = 0, vy = 0
+const friction = 0.95
 
 ;(function drawFrame() {
   requestAnimationFrame(drawFrame, canvas)
   context.clearRect(0, 0, canvas.width, canvas.height)
 
-  const left = 0, top = 0, right = canvas.width, bottom = canvas.height
+  const dx = targetX - ball.x
+  const dy = targetY - ball.y
+  const ax = dx * spring
+  const ay = dy * spring
 
-  // let speed = Math.sqrt(vx * vx + vy * vy)
-  // const angle = Math.atan2(vy, vx)
-
-  // speed -= 0.1
-
-  // vx = Math.cos(angle) * speed
-  // vy = Math.sin(angle) * speed
+  vx += ax
+  vy += ay
 
   vx *= friction
   vy *= friction
-
-  // 应用速度
+  
   ball.x += vx
   ball.y += vy
 
-  if (ball.x + ball.radius > right) {
-    ball.x = right - ball.radius
-    vx *= - bouncing
-  } else if (ball.x - ball.radius < left) {
-    ball.x = left + ball.radius
-    vx *= - bouncing
-  }
-
-  if (ball.y + ball.radius > bottom) {
-    ball.y = bottom - ball.radius
-    vy *= - bouncing
-  } else if (ball.y - ball.radius < top) {
-    ball.y = top + ball.radius
-    vy *= - bouncing
-  }
-
   ball.draw(context)
 })()
+
+
+
 

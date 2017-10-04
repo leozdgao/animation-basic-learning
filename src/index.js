@@ -15,7 +15,7 @@ const startP = getPoint(box)
 
 new Pull({
   target: box,
-  friction: 0.8
+  friction: 0.7
 }).start().on('end', (e) => {
   const p = getPoint(box)
 

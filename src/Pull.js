@@ -39,16 +39,18 @@ export default class Pull extends EventEmitter {
 
   moveHandler(e) {
     if (this.isPulling) {
-      const deltaX = e.clientX - this.lastP.x
-      const velocity = this.friction * deltaX
-
-      this.progress += velocity
-      this.target.style.transform = `translateX(${this.progress}px)`
-
-      this.lastP = {
-        x: e.clientX,
-        y: e.clientY
-      }
+      window.requestAnimationFrame(() => {
+        const deltaX = e.clientX - this.lastP.x
+        const velocity = this.friction * deltaX
+  
+        this.progress += velocity
+        this.target.style.transform = `translateX(${this.progress}px)`
+  
+        this.lastP = {
+          x: e.clientX,
+          y: e.clientY
+        }
+      })
     }
   }
 

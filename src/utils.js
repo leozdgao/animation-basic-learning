@@ -43,3 +43,19 @@ export function colorToRGB(color, alpha) {
     return `rgb(${p.red}, ${p.green}, ${p.blue})`
   }
 }
+
+export function rectCollision(rect0, rect1) {
+  return !(
+    (rect0.x + rect0.width) < rect1.x ||
+    (rect0.y + rect0.height) < rect1.y ||
+    (rect1.x + rect1.width) < rect0.x ||
+    (rect1.y + rect1.height) < rect0.y
+  )
+}
+
+export function radiusCollision(ball0, ball1) {
+  // 圆心的距离
+  const dist = pythagorean(ball0, ball1)
+  
+  return dist < (ball0.radius + ball1.radius)
+}

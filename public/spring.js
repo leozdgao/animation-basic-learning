@@ -5,6 +5,8 @@ class Ball {
   constructor(radius, color) {
     this.x = 0
     this.y = 0
+    this.vx = 0
+    this.vy = 0
     this.radius = radius || 40
     this.rotation = 0
     this.scaleX = 1
@@ -33,32 +35,66 @@ class Ball {
   }
 }
 
+const captureMouse = function(canvas) {
+  let x = 0, y = 0
+  const handler = e => {
+    x = e.offsetX
+    y = e.offsetY
+  }
+  const obj = {
+    dispose() {
+      canvas.removeEventListener('mousemove', handler)
+    },
+    get x() { return x },
+    get y() { return y }
+  }
+  canvas.addEventListener('mousemove', handler)
+
+  return obj
+}
+
 const ball = new Ball()
+const ball1 = new Ball()
+const ball2 = new Ball()
+
 const spring = 0.1
 const targetX = canvas.width / 2
 const targetY = canvas.height / 2
 let vx = 0, vy = 0
 const friction = 0.95
+const gravity = 2
+
+const mouse = captureMouse(canvas)
+
+function move(ball, targetX, targetY) {
+  ball.vx += (targetX - ball.x) * spring
+  ball.vy += (targetY - ball.y) * spring
+
+  ball.vy += gravity
+
+  ball.vx *= friction
+  ball.vy *= friction
+  
+  ball.x += ball.vx
+  ball.y += ball.vy
+}
 
 ;(function drawFrame() {
   requestAnimationFrame(drawFrame, canvas)
   context.clearRect(0, 0, canvas.width, canvas.height)
 
-  const dx = targetX - ball.x
-  const dy = targetY - ball.y
-  const ax = dx * spring
-  const ay = dy * spring
+  move(ball, mouse.x, mouse.y)
+  move(ball1, ball.x, ball.y)
+  move(ball2, ball1.x, ball1.y)
 
-  vx += ax
-  vy += ay
-
-  vx *= friction
-  vy *= friction
-  
-  ball.x += vx
-  ball.y += vy
+  context.beginPath()
+  context.moveTo(ball.x, ball.y)
+  context.lineTo(mouse.x, mouse.y)
+  context.stroke()
 
   ball.draw(context)
+  ball1.draw(context)
+  ball2.draw(context)
 })()
 
 

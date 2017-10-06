@@ -54,7 +54,10 @@ pullEngine.on('update', (e) => {
   const { progressX, progressY } = e
   const nextX = startCenterP.x + progressX
   const nextY = startCenterP.y + progressY
-  const dist = Math.sqrt(nextX * nextX + nextY * nextY)
+  const dist = fixedBall.distanceTo({
+    x: nextX,
+    y: nextY
+  })
 
   // draggableBall.style.transform = `translate(${progressX}px, ${progressY}px)`
   draggableBall.setAttribute({
@@ -62,7 +65,7 @@ pullEngine.on('update', (e) => {
     cy: nextY
   })
 
-  const nextRaius = startRadius - dist * 0.05
+  const nextRaius = startRadius - dist * 0.1
   if (nextRaius > 0) {
     fixedBall.setAttribute('r', nextRaius)
   }

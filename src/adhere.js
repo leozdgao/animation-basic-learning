@@ -1,4 +1,4 @@
-import { radianToDegree, degreeToRadian, isTypeOf } from './utils'
+import { radianToDegree, degreeToRadian } from './utils'
 
 // 获取两个点之间的中点
 const getCenterOfTwoPoints = (p0, p1) => {
@@ -13,7 +13,7 @@ export const adhereTwoCircle = (circle0, circle1, arc) => {
   // 把两个圆心的中点作为贝塞尔曲线的控制点
   const controlP = getCenterOfTwoPoints(centerP0, centerP1)
   // 连接两个圆心的向量的角度
-  const angleBetweenBalls = radianToDegree(Math.atan2(centerP1.y - centerP0.y, centerP1.x - centerP0.x))
+  const angleBetweenBalls = circle0.degreeTo(circle1.center)
   // 得到 4 个切点
   const contactP0ForBall0 = circle0.getContactPoint(angleBetweenBalls - 90)
   const contactP1ForBall0 = circle0.getContactPoint(angleBetweenBalls + 90)

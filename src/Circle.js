@@ -1,14 +1,10 @@
-import { isTypeOf, degreeToRadian } from './utils'
+import { isTypeOf, degreeToRadian, radianToDegree } from './utils'
 
 const getBaseValFromSVGLength = (prop) => {
   return prop.baseVal.value
 }
 
 export default class Circle {
-  static distanceTo(c0, c1) {
-    
-  }
-
   constructor(circle) {
     if (!isTypeOf(circle, 'SVGCircleElement')) {
       throw new TypeError('SVGCircleElement is required')
@@ -47,5 +43,18 @@ export default class Circle {
       const val = obj[key]
       this._node.setAttribute(key, val)
     })
+  }
+
+  distanceTo(p) {
+    const center = this.center
+    const distX = p.x - center.x
+    const distY = p.y - center.y
+
+    return Math.sqrt(distX * distX, distY * distY)
+  }
+
+  degreeTo(p) {
+    const center = this.center
+    return radianToDegree(Math.atan2(p.y - center.y, p.x - center.x))
   }
 }

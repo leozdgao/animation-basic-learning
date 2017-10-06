@@ -50,7 +50,7 @@ export default class Circle {
     const distX = p.x - center.x
     const distY = p.y - center.y
 
-    return Math.sqrt(distX * distX, distY * distY)
+    return Math.sqrt(distX * distX + distY * distY)
   }
 
   degreeTo(p) {

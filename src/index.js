@@ -36,15 +36,17 @@ const getPoint = function(target) {
 // 动画前的起始点
 const startP = getPoint(draggableBall._node)
 let startCenterP = null, startRadius = null
-const pullEngine = new Pull({
-  target: draggableBall._node
-}).start()
+
 const updateAdhere = () => {
   const pathD = adhereTwoCircle(fixedBall, draggableBall, true)
   const path = createOrUpdatePath(svg, pathD)
   path.setAttribute('stroke', 'red')
   path.setAttribute('fill', 'red')
 }
+
+const pullEngine = new Pull({
+  target: draggableBall._node
+}).start()
 
 pullEngine.on('start', () => {
   startCenterP = draggableBall.center
@@ -54,10 +56,6 @@ pullEngine.on('update', (e) => {
   const { progressX, progressY } = e
   const nextX = startCenterP.x + progressX
   const nextY = startCenterP.y + progressY
-  const dist = fixedBall.distanceTo({
-    x: nextX,
-    y: nextY
-  })
 
   // draggableBall.style.transform = `translate(${progressX}px, ${progressY}px)`
   draggableBall.setAttribute({
@@ -65,7 +63,12 @@ pullEngine.on('update', (e) => {
     cy: nextY
   })
 
+  const dist = fixedBall.distanceTo({
+    x: nextX,
+    y: nextY
+  })
   const nextRaius = startRadius - dist * 0.1
+
   if (nextRaius > 0) {
     fixedBall.setAttribute('r', nextRaius)
   }
@@ -84,10 +87,23 @@ pullEngine.on('end', e => {
   springEngine.on('update', (e) => {
     const { startX, startY, progressX, progressY } = e
     // draggableBall.style.transform = `translate(${startX + progressX - startP.x}px, ${startY + progressY - startP.y}px)`
+    const nextX = center.x + progressX
+    const nextY = center.y + progressY
+
     draggableBall.setAttribute({
-      cx: center.x + progressX,
-      cy: center.y + progressY
+      cx: nextX,
+      cy: nextY
     })
+
+    const dist = fixedBall.distanceTo({
+      x: nextX,
+      y: nextY
+    })
+    const nextRaius = startRadius - dist * 0.1
+  
+    if (nextRaius > 0) {
+      fixedBall.setAttribute('r', nextRaius)
+    }
 
     updateAdhere()
   })

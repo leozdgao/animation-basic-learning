@@ -12,7 +12,8 @@ export default class Pull extends EventEmitter {
     // 起始点
     this.startP = null
     this.lastP = null
-    this.progress = 0
+    this.progressX = 0
+    this.progressY = 0
 
     this.downHandler = this.downHandler.bind(this)
     this.upHandler = this.upHandler.bind(this)
@@ -35,16 +36,27 @@ export default class Pull extends EventEmitter {
 
     window.addEventListener('mousemove', this.moveHandler)
     window.addEventListener('mouseup', this.upHandler)
+
+    this.emit('start')
   }
 
   moveHandler(e) {
     if (this.isPulling) {
       window.requestAnimationFrame(() => {
         const deltaX = e.clientX - this.lastP.x
-        const velocity = this.friction * deltaX
+        const deltaY = e.clientY - this.lastP.y
+
+        const velocityX = this.friction * deltaX
+        const velocityY = this.friction * deltaY
   
-        this.progress += velocity
-        this.target.style.transform = `translateX(${this.progress}px)`
+        this.progressX += velocityX
+        this.progressY += velocityY
+
+        this.emit('update', {
+          progressX: this.progressX,
+          progressY: this.progressY
+        })
+        // this.target.style.transform = `translateX(${this.progress}px)`
   
         this.lastP = {
           x: e.clientX,
@@ -56,7 +68,8 @@ export default class Pull extends EventEmitter {
 
   upHandler() {
     this.isPulling = false
-    this.progress = 0
+    this.progressX = 0
+    this.progressY = 0
 
     window.removeEventListener('mousemove', this.moveHandler)
     window.removeEventListener('mouseup', this.upHandler)

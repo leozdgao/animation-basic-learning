@@ -59,3 +59,11 @@ export function radiusCollision(ball0, ball1) {
   
   return dist < (ball0.radius + ball1.radius)
 }
+
+export function createSVGElement(tagName) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tagName)
+}
+
+export function isTypeOf(obj, type) {
+  return Object.prototype.toString.call(obj) === `[object ${type}]`
+}

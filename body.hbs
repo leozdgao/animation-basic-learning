@@ -1,10 +1,52 @@
 {{!-- <canvas id="canvas" width="375" height="400"></canvas> --}}
 <style>
   #box {
+    position: relative;
     width: 50px;
     height: 80px;
     background-color: #CCCCCC;
-    cursor: pointer;
+  }
+  #notify, .shadow {
+    fill: red;
+    r: 8;
+    cx: 8;
+    cy: 8;
+  }
+  .shadow {
+
+  }
+  .notify {
+    position: absolute;
+    left: 42px;
+    top: 72px;
+  }
+  .content {
+    text-anchor: middle;
+    x: 50%;
+    y: 50%;
+    font-size: 20px;
+    stroke: #fff;
+    fill: #fff;
+  }
+  .ball {
+    cx: 50;
+    cy: 50;
+    r: 12;
+    fill: red;
   }
 </style>
-<div id="box"></div>
+{{!-- <div id="box">
+  <svg class="notify">
+    <circle class="shadow" />
+    <g>
+      <circle id="notify" />
+      <text class="content" x="50%" y="50%">8</text>
+    </g>
+  </svg>
+</div> --}}
+<svg id="test" width="500" height="500" viewBox="0 0 500 500">
+  <g fill="red">
+    <circle id="fixed" cx="50" cy="50" r="18" />
+    <circle id="draggable" cx="50" cy="50" r="18" />
+  </g>
+</svg>

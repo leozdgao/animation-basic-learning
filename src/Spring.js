@@ -1,13 +1,15 @@
 import EventEmitter from 'wolfy87-eventemitter'
 
-const spring = {
-  noWobble: { stiffness: 170, damping: 26 }, // the default, if nothing provided
+export const spring = {
+  noWobble: { stiffness: 170, damping: 26 },
   gentle: { stiffness: 120, damping: 14 },
   wobbly: { stiffness: 180, damping: 12 },
   stiff: { stiffness: 210, damping: 20 }
 }
 const DEFAULT_SPRING_FORCE = spring.wobbly
 const SECOND_PER_FRAME = 1 / 60
+
+// TODO: 采样 For css spring
 
 export default class Spring extends EventEmitter {
   constructor(options) {
@@ -27,34 +29,55 @@ export default class Spring extends EventEmitter {
     // 劲度系数
     this.stiffness = options.stiffness || DEFAULT_SPRING_FORCE.stiffness
     // 速度
-    this.velocity = 0
+    this.velocityX = 0
+    this.velocityY = 0
 
-    this.progress = 0
+    this.progressX = 0
+    this.progressY = 0
   }
 
   start() {
     this.animationId = this._doAnimation()
+
+    return this
   }
 
   _doAnimation() {
     return window.requestAnimationFrame((timestamp) => {
-      const currentX = this.startP.x + this.progress
+      const currentX = this.startP.x + this.progressX
+      const currentY = this.startP.y + this.progressY
       // 弹力
-      const stringForce = - this.stiffness * (currentX - this.destP.x)
+      const stringForceX = - this.stiffness * (currentX - this.destP.x)
+      const stringForceY = - this.stiffness * (currentY - this.destP.y)
       // 摩擦力
-      const friction = - this.damping * this.velocity
+      const frictionX = - this.damping * this.velocityX
+      const frictionY = - this.damping * this.velocityY
       // 加速度
-      const a = (stringForce + friction) / this.mass
+      const aX = (stringForceX + frictionX) / this.mass
+      const aY = (stringForceY + frictionY) / this.mass
 
-      const deltaV = a * SECOND_PER_FRAME
-      this.velocity += deltaV
+      const deltaVX = aX * SECOND_PER_FRAME
+      const deltaVY = aY * SECOND_PER_FRAME
 
-      const deltaS = this.velocity * SECOND_PER_FRAME
-      this.progress += deltaS
+      this.velocityX += deltaVX
+      this.velocityY += deltaVY
 
-      this.target.style.transform = `translateX(${this.startP.x + this.progress}px)`
+      const deltaSX = this.velocityX * SECOND_PER_FRAME
+      const deltaSY = this.velocityY * SECOND_PER_FRAME
 
-      if (Math.abs(deltaV) < this.precision && Math.abs(deltaS) < this.precision) {
+      this.progressX += deltaSX
+      this.progressY += deltaSY
+
+      this.emit('update', {
+        startX: this.startP.x,
+        startY: this.startP.y,
+        progressX: this.progressX,
+        progressY: this.progressY
+      })
+
+      // this.target.style.transform = `translateX(${this.startP.x + this.progress}px)`
+
+      if (Math.abs(deltaVX) < this.precision && Math.abs(deltaSX) < this.precision) {
         this.emit('end')
       } else {
         this._doAnimation()

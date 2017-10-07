@@ -35,11 +35,12 @@ const getPoint = function(target) {
 
 // 动画前的起始点
 const startP = getPoint(draggableBall._node)
-let startCenterP = null, startRadius = null
+let path = null
+let startCenterP = null, startRadius = null, isTooFar = false, isStartPull = false, noAdhere = false
 
 const updateAdhere = () => {
   const pathD = adhereTwoCircle(fixedBall, draggableBall, true)
-  const path = createOrUpdatePath(svg, pathD)
+  path = createOrUpdatePath(svg, pathD)
   path.setAttribute('stroke', 'red')
   path.setAttribute('fill', 'red')
 }
@@ -69,48 +70,94 @@ pullEngine.on('update', (e) => {
   })
   const nextRaius = startRadius - dist * 0.1
 
-  if (nextRaius > 0) {
-    fixedBall.setAttribute('r', nextRaius)
-  }
+  if (nextRaius < 3) {
+    isTooFar = true
 
-  updateAdhere()
-})
-pullEngine.on('end', e => {
-  const springEngine = new Spring({
-    target: draggableBall._node,
-    start: getPoint(draggableBall._node),
-    dest: startP,
-    ...spring.wobbly
-  }).start()
-  const center = draggableBall.center
+    if (!isStartPull) {
+      isStartPull = true
+      fixedBall.setAttribute('r', 1)
 
-  springEngine.on('update', (e) => {
-    const { startX, startY, progressX, progressY } = e
-    // draggableBall.style.transform = `translate(${startX + progressX - startP.x}px, ${startY + progressY - startP.y}px)`
-    const nextX = center.x + progressX
-    const nextY = center.y + progressY
+      // 拉太远了，拽过来
+      const springEngine = new Spring({
+        target: fixedBall._node,
+        start: fixedBall.center,
+        dest: draggableBall.center,
+        stiffness: 370,
+        damping: 50
+      }).start()
+      const center = fixedBall.center
 
-    draggableBall.setAttribute({
-      cx: nextX,
-      cy: nextY
-    })
+      springEngine.on('update', (e) => {
+        const { startX, startY, progressX, progressY } = e
+        const nextX = center.x + progressX
+        const nextY = center.y + progressY
+    
+        fixedBall.setAttribute({
+          cx: nextX,
+          cy: nextY
+        });
 
-    const dist = fixedBall.distanceTo({
-      x: nextX,
-      y: nextY
-    })
-    const nextRaius = startRadius - dist * 0.1
-  
-    if (nextRaius > 0) {
+        springEngine.destP = draggableBall.center
+
+        updateAdhere()
+      })
+      springEngine.on('end', () => {
+        // 到位置后把自己删了
+        fixedBall._node.parentNode.removeChild(fixedBall._node)
+        path.parentNode.removeChild(path)
+
+        noAdhere = true
+      })
+    }
+  } else {
+    if (!isTooFar) {
       fixedBall.setAttribute('r', nextRaius)
     }
+  }
 
+  if (!noAdhere) {
     updateAdhere()
-  })
-  springEngine.on('end', () => {
-    fixedBall.setAttribute({
-      r: startRadius
+  }
+})
+pullEngine.on('end', e => {
+  // 没有拉太远，弹回来
+  if (!isTooFar) {
+    const springEngine = new Spring({
+      target: draggableBall._node,
+      start: draggableBall.center,
+      dest: fixedBall.center,
+      ...spring.wobbly
+    }).start()
+    const center = draggableBall.center
+  
+    springEngine.on('update', (e) => {
+      const { startX, startY, progressX, progressY } = e
+      // draggableBall.style.transform = `translate(${startX + progressX - startP.x}px, ${startY + progressY - startP.y}px)`
+      const nextX = center.x + progressX
+      const nextY = center.y + progressY
+  
+      draggableBall.setAttribute({
+        cx: nextX,
+        cy: nextY
+      })
+  
+      const dist = fixedBall.distanceTo({
+        x: nextX,
+        y: nextY
+      })
+      const nextRaius = startRadius - dist * 0.1
+    
+      if (nextRaius > 0) {
+        fixedBall.setAttribute('r', nextRaius)
+      }
+  
+      updateAdhere()
     })
-    console.log('end')
-  })
+    springEngine.on('end', () => {
+      fixedBall.setAttribute({
+        r: startRadius
+      })
+      console.log('end')
+    })
+  }
 })

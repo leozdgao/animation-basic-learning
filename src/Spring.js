@@ -75,8 +75,6 @@ export default class Spring extends EventEmitter {
         progressY: this.progressY
       })
 
-      // this.target.style.transform = `translateX(${this.startP.x + this.progress}px)`
-
       if (Math.abs(deltaVX) < this.precision && Math.abs(deltaSX) < this.precision) {
         this.emit('end')
       } else {
